@@ -250,7 +250,13 @@ module Resque
       if term_child
         if !fork_per_job
           signal_all_workers(:QUIT)
-          sleep(resque_pre_shutdown_timeout.seconds)
+
+          timer = 0
+          while(!all_processes_finished && timer < resque_pre_shutdown_timeout.seconds)            
+            sleep(5)
+            timer += 5
+          end
+
           signal_all_workers(:TERM)
         else
           signal_all_workers(:TERM)
@@ -260,6 +266,15 @@ module Resque
       end
       reap_all_workers(0) # will hang until all workers are shutdown
       :break
+    end
+
+    def all_processes_finished
+      all_pids.each do |pid|
+        count = %x[ps -p #{pid} | wc -l].squish.to_i - 1
+        puts count.inspect
+        return false if count > 1
+      end
+      return true
     end
 
     def graceful_worker_shutdown!(signal)
