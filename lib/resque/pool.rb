@@ -152,6 +152,7 @@ module Resque
     def self_pipe; @self_pipe ||= [] end
     def sig_queue; @sig_queue ||= [] end
     def term_child; @term_child ||= ENV['TERM_CHILD'] end
+    def resque_pre_shutdown_timeout; @resque_pre_shutdown_timeout ||= ENV['RESQUE_PRE_SHUTDOWN_TIMEOUT'].to_i end
 
 
     def init_self_pipe!
@@ -246,6 +247,7 @@ module Resque
     def graceful_worker_shutdown_and_wait!(signal)
       log "#{signal}: graceful shutdown, waiting for children"
       if term_child
+        sleep(resque_pre_shutdown_timeout.seconds)
         signal_all_workers(:TERM)
       else
         signal_all_workers(:QUIT)
