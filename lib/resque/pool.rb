@@ -271,8 +271,7 @@ module Resque
     def all_processes_finished
       all_pids.each do |pid|
         count = %x[ps -p #{pid} | wc -l].squish.to_i - 1
-        puts count.inspect
-        return false if count > 1
+        return false if count > 0
       end
       return true
     end
