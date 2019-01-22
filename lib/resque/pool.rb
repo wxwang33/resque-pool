@@ -270,7 +270,7 @@ module Resque
 
     def all_processes_finished
       all_pids.each do |pid|
-        count = %x[ps -p #{pid} | wc -l].squish.to_i - 1
+        count = %x[ps -p #{pid} --no-headers | grep -Fv "defunct" | wc -l].squish.to_i
         return false if count > 0
       end
       return true
