@@ -248,15 +248,20 @@ module Resque
     def graceful_worker_shutdown_and_wait!(signal)
       log "#{signal}: graceful shutdown, waiting for children"
       if term_child
+        log ">>>>term_child"
         if !fork_per_job
+          log ">>>>before sending quit"
           signal_all_workers(:QUIT)
 
+          log ">>>>timing"
           timer = 0
           while(!all_processes_finished && timer < resque_pre_shutdown_timeout.seconds)            
+            log ">>>>sleeping for 5 sec"
             sleep(5)
             timer += 5
           end
-
+          log ">>>>sleeping for 30 sec"
+          sleep(30)
           signal_all_workers(:TERM)
         else
           signal_all_workers(:TERM)
