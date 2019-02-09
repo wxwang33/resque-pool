@@ -257,6 +257,8 @@ module Resque
             timer += 5
           end
 
+          log "#{signal}: all workers finished or quited"
+
           signal_all_workers(:TERM)
         else
           signal_all_workers(:TERM)
