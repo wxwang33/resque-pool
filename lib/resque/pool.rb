@@ -359,7 +359,7 @@ module Resque
           break unless wpid
 
           if worker = delete_worker(wpid)
-            log "Reaped resque worker[#{status.pid}] (status: #{status.exitstatus}) queues: #{worker.queues.join(",")}"
+            log "Reaped resque worker[#{status.pid}] (status: #{status.exitstatus}) queues: #{all_known_queues.join(",")}"
           else
             # this died before it could be killed, so it's not going to have any extra info
             log "Tried to reap worker [#{status.pid}], but it had already died. (status: #{status.exitstatus})"
