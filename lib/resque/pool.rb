@@ -258,6 +258,8 @@ module Resque
             timer += 5
           end
 
+          signal_all_workers(:TERM)
+          
           log "Waiting #{term_timeout}s for term timeout"
           sleep(term_timeout)
 
