@@ -250,7 +250,6 @@ module Resque
       log "#{signal}: graceful shutdown, waiting for children"
       if term_child
         if !fork_per_job
-          log "Sending QUIT signal to workers"
           signal_all_workers(:QUIT)
 
           timer = 0
@@ -262,9 +261,9 @@ module Resque
           log "Waiting #{term_timeout}s for term timeout"
           sleep(term_timeout)
 
-          log "Sending KILL signal to workers"
-          active_processes.each{|pid| Process.kill("KILL", pid)}
-          # signal_all_workers(:TERM)
+          active_pids = active_processes
+          log "Sending KILL signal to #{active_pids.size} workers: #{active_pids.join(', ')}"
+          active_pids.each{|pid| Process.kill("KILL", pid)}
         else
           signal_all_workers(:TERM)
         end
