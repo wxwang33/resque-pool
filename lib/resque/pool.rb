@@ -154,6 +154,7 @@ module Resque
     def term_child; @term_child ||= ENV['TERM_CHILD'] end
     def resque_pre_shutdown_timeout; @resque_pre_shutdown_timeout ||= ENV['RESQUE_PRE_SHUTDOWN_TIMEOUT'].to_i end
     def fork_per_job; @fork_per_job ||= ENV['FORK_PER_JOB'].to_bool end
+    def term_timeout; @term_timeout ||= (ENV['RESQUE_TERM_TIMEOUT'] || 4.0).to_f end
 
 
     def init_self_pipe!
@@ -249,17 +250,21 @@ module Resque
       log "#{signal}: graceful shutdown, waiting for children"
       if term_child
         if !fork_per_job
+          log "Sending QUIT signal to workers"
           signal_all_workers(:QUIT)
 
           timer = 0
-          while(!all_processes_finished && timer < resque_pre_shutdown_timeout.seconds)            
+          while(!all_processes_finished && timer < resque_pre_shutdown_timeout.seconds)
             sleep(5)
             timer += 5
           end
 
-          log "#{signal}: all workers finished or quited"
+          logs "Waiting #{term_timeout}s for term timeout"
+          sleep(term_timeout)
 
-          signal_all_workers(:TERM)
+          log "Sending KILL signal to workers"
+          active_processes.each{|pid| Process.kill("KILL", pid)}
+          # signal_all_workers(:TERM)
         else
           signal_all_workers(:TERM)
         end
@@ -271,11 +276,11 @@ module Resque
     end
 
     def all_processes_finished
-      all_pids.each do |pid|
-        count = %x[ps -p #{pid} --no-headers | grep -Fv "defunct" | wc -l].squish.to_i
-        return false if count > 0
-      end
-      return true
+      return active_processes.size == 0
+    end
+
+    def active_processes
+      return all_pids.delete_if{|pid| %x[ps -p #{pid} --no-headers | grep -Fv "defunct" | wc -l].squish.to_i == 0}
     end
 
     def graceful_worker_shutdown!(signal)
