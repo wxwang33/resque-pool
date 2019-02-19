@@ -259,7 +259,7 @@ module Resque
             timer += 5
           end
 
-          logs "Waiting #{term_timeout}s for term timeout"
+          log "Waiting #{term_timeout}s for term timeout"
           sleep(term_timeout)
 
           log "Sending KILL signal to workers"
