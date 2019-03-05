@@ -91,14 +91,14 @@ module Resque
       # TODO: make this use an actual logger
       def log(message)
         return if $skip_logging
-        logger.info {"#{app}: #{message}"}
+        logger.info {message}
         #$stdout.fsync
       end
 
       # TODO: make this use an actual logger
       def log_worker(message)
         return if $skip_logging
-        logger.info {"#{app}: #{message}"}
+        logger.info {message}
         #$stdout.fsync
       end
 
