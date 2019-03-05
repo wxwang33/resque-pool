@@ -1,7 +1,11 @@
+require 'resque/pool/logger_builder'
+
 module Resque
   class Pool
     module Logging
       extend self
+
+      attr_accessor :logger
 
       # This reopens ALL logfiles in the process that have been rotated
       # using logrotate(8) (without copytruncate) or similar tools.
@@ -87,14 +91,14 @@ module Resque
       # TODO: make this use an actual logger
       def log(message)
         return if $skip_logging
-        puts "resque-pool-manager#{app}[#{Process.pid}]: #{message}"
+        logger.info {"#{app}: #{message}"}
         #$stdout.fsync
       end
 
       # TODO: make this use an actual logger
       def log_worker(message)
         return if $skip_logging
-        puts "resque-pool-worker#{app}[#{Process.pid}]: #{message}"
+        logger.info {"#{app}: #{message}"}
         #$stdout.fsync
       end
 
@@ -103,6 +107,15 @@ module Resque
         app_name   = self.respond_to?(:app_name)       && self.app_name
         app_name ||= self.class.respond_to?(:app_name) && self.class.app_name
         app_name ? "[#{app_name}]" : ""
+      end
+
+      def logger
+        @logger ||= Resque::Pool::LoggerBuilder.new(
+          quiet: false,
+          verbose: true,
+          log_dev: $stdout,
+          format: "json"
+        ).build
       end
 
       private
