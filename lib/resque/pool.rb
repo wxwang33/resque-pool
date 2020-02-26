@@ -441,7 +441,7 @@ module Resque
       pid = fork do
         Process.setpgrp unless Resque::Pool.single_process_group
         worker.worker_parent_pid = Process.pid
-        log_worker "Starting worker #{worker}"
+        log_worker "Starting worker #{worker.queue_patterns}"
         call_after_prefork!(worker)
         reset_sig_handlers!
         #self_pipe.each {|io| io.close }
