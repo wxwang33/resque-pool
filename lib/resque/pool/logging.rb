@@ -110,12 +110,7 @@ module Resque
       end
 
       def logger
-        @logger ||= Resque::Pool::LoggerBuilder.new(
-          quiet: false,
-          verbose: true,
-          log_dev: $stdout,
-          format: "json"
-        ).build
+        @logger = ZuoraConnect.custom_logger(name: 'ResquePool', level: MonoLogger::INFO)
       end
 
       private
