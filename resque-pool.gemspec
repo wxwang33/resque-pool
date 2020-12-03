@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "resque", "~> 1.22"
   s.add_dependency "rake"
-  s.add_dependency "zuora_connect", "~> 2.0.38"
+  s.add_dependency "zuora_connect", ">= 3.0.0"
   s.add_development_dependency "rspec",    "~> 2.99"
   s.add_development_dependency "cucumber", "~> 1.2"
   s.add_development_dependency "aruba",    "~> 0.4.11"

@@ -110,7 +110,7 @@ module Resque
       end
 
       def logger
-        @logger = ZuoraConnect.custom_logger(name: 'ResquePool', level: MonoLogger::INFO)
+        @logger = ZuoraObservability::Logger.custom_logger(name: 'ResquePool', level: MonoLogger::INFO)
       end
 
       private
